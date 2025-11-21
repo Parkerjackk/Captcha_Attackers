@@ -1,6 +1,6 @@
 # selenium_wrapper.py
 from selenium_uniq_driver import UniqDriver, HardwareType, SoftwareName, OperatingSystem
-from webgl_spoof import build_webgl_spoof_script
+from .webgl_spoof import build_webgl_spoof_script
 
 def create_selenium_driver(profile):
     # Map OS → selenium-uniq-driver enum

@@ -4,11 +4,12 @@ import asyncio
 import random
 import string
 
-from profile_generator import generate_random_profile
-from profile import BrowserProfile
-from selenium_wrapper import create_selenium_driver
-from tls_wrapper import create_tls_client
-from mouse_movement import find_box
+from profiles.profile_generator import generate_random_profile
+from profiles.profile import BrowserProfile
+from environment.selenium_wrapper import create_selenium_driver
+from environment.tls_wrapper import create_tls_client
+from interactions.mouse_movement import find_box
+from interactions.mouse_movement import validate
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 
@@ -37,11 +38,14 @@ async def main():
         print("TLS client initialized.")
 
         # Find the box & move to it
-        box = find_box(driver)
+        box, box_x, box_y = find_box(driver)
 
         # Insert random character
         random_char = random.choice(string.ascii_letters)
         box.send_keys(random_char)
+
+        # Validate Answer
+        validate(driver, box_x, box_y)
 
         # Wait so you can interact with the browser
         input("Press Enter to close the browser...")

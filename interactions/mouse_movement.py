@@ -42,4 +42,18 @@ def find_box(driver):
     nonLinear_mouse_movement(driver, start_x=start_x , start_y=start_y, target_x=target_x , target_y=target_y , steps = 50)
     ActionChains(driver).click().perform()
 
-    return box 
+    return box, target_x, target_y
+
+def validate(driver, start_x, start_y):
+
+    # Find validate button
+    validate = driver.find_element(By.CSS_SELECTOR, ".btn-primary")
+
+    # Get element center coordinates
+    rect = validate.rect
+    target_x = rect['x'] + rect['width'] / 2
+    target_y = rect['y'] + rect['height'] / 2
+
+    # Move to the input box 
+    nonLinear_mouse_movement(driver, start_x=start_x , start_y=start_y, target_x=target_x , target_y=target_y , steps = 50)
+    ActionChains(driver).click().perform()

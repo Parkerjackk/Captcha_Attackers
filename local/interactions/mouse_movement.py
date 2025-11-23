@@ -55,5 +55,5 @@ def validate(driver, start_x, start_y):
     target_y = rect['y'] + rect['height'] / 2
 
     # Move to the input box 
-    nonLinear_mouse_movement(driver, start_x=start_x , start_y=start_y, target_x=target_x , target_y=target_y , steps = 50)
+    nonLinear_mouse_movement(driver, start_x=start_x , start_y=start_y, target_x=target_x , target_y=target_y , steps = 5)
     ActionChains(driver).click().perform()

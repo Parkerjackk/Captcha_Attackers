@@ -3,6 +3,7 @@
 import asyncio
 import random
 import string
+import argparse
 
 from profiles.profile_generator import generate_random_profile
 from profiles.profile import BrowserProfile
@@ -10,11 +11,11 @@ from environment.selenium_wrapper import create_selenium_driver
 from environment.tls_wrapper import create_tls_client
 from interactions.mouse_movement import find_box
 from interactions.mouse_movement import validate
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
+
 
 
 async def main():
+
     # Generate a new identity
     raw_profile = generate_random_profile()
     profile = BrowserProfile(**raw_profile)
@@ -29,9 +30,9 @@ async def main():
     driver = create_selenium_driver(profile)
 
     try:
-        # Go to Page
+        # Load Page
         driver.get("https://group4.kokax.com/")
-        print("Browser launched and loaded https://example.com")
+        print("Browser launched and loaded https://group4.kokax.com/")
 
         # Match TLS & enforce WebGL injection
         tls_client = await create_tls_client(profile)

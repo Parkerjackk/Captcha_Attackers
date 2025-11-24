@@ -60,9 +60,28 @@ def find_box(driver):
 
 
 def validate(driver, bx, by):
+    # Find the validate button
     btn = driver.find_element(By.CSS_SELECTOR, ".btn-primary")
-    rect = btn.rect
-    tx = rect['x'] + rect['width'] / 2
-    ty = rect['y'] + rect['height'] / 2
-    move_smooth(driver, bx, by, tx, ty, steps=15)
-    cdp_click(driver, tx, ty)
+
+    # Try to find the enclosing form
+    try:
+        form = btn.find_element(By.XPATH, "./ancestor::form")
+        print("[Cloud] Found parent form, submitting via JS")
+
+        # Scroll it into view for visuals (optional)
+        driver.execute_script(
+            "arguments[0].scrollIntoView({behavior:'auto',block:'center'});",
+            btn
+        )
+        time.sleep(0.2)
+
+        # Submit the form directly
+        driver.execute_script("arguments[0].submit();", form)
+    except Exception as e:
+        print("[Cloud] Could not find/submit form:", e)
+        # Fallback: just click via JS
+        driver.execute_script("arguments[0].click();", btn)
+        print("[Cloud] Clicked validate via JS .click() fallback")
+
+    # Give the page time to show the result
+    time.sleep(1.0)

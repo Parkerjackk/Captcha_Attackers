@@ -1,59 +1,119 @@
 import random
 import time
+import math
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.actions.pointer_input import PointerInput
+from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-def nonLinear_mouse_movement(driver, start_x, start_y, target_x, target_y, steps = 50):
-        
-    ActionChains(driver).move_by_offset(0, 0).perform() # reset internal pointer
 
-    ActionChains(driver).move_by_offset(start_x, start_y).perform() # move to random starting point
+def humanlike_mouse_movement(driver, element, steps=12):
 
-    action = ActionChains(driver)
+    rect = element.rect
+    target_x = rect["x"] + rect["width"] / 2
+    target_y = rect["y"] + rect["height"] / 2
 
-    dx = (target_x - start_x) / steps
-    dy = (target_y - start_y) / steps
+    pointer = PointerInput("mouse", "mouse")
+    actions = ActionBuilder(driver, mouse=pointer)
 
-    # Add noise to each step
-    for _ in range(steps):
-        noise_x = random.uniform(-1, 1)
-        noise_y = random.uniform(-1, 1)
-        action.move_by_offset(dx + noise_x, dy + noise_y).perform()
-        # Add random speed
-        time.sleep(random.uniform(0.01, 0.05))
+    # Reset cursor to element center
+    actions.pointer_action.move_to(element)
+    actions.perform()
+
+    # Random control points
+    cp1 = (target_x + random.randint(-60, 60),
+           target_y + random.randint(-60, 60))
+    cp2 = (target_x + random.randint(-60, 60),
+           target_y + random.randint(-60, 60))
+
+    steps = 18
+
+    for i in range(1, steps + 1):
+        t = i / steps
+
+        # Cubic Bézier easing
+        x = ((1 - t)**3 * target_x +
+             3 * (1 - t)**2 * t * cp1[0] +
+             3 * (1 - t) * t**2 * cp2[0] +
+             t**3 * target_x)
+
+        y = ((1 - t)**3 * target_y +
+             3 * (1 - t)**2 * t * cp1[1] +
+             3 * (1 - t) * t**2 * cp2[1] +
+             t**3 * target_y)
+
+        # New action block each step
+        step_actions = ActionBuilder(driver, mouse=pointer)
+        step_actions.pointer_action.move_to_location(int(x), int(y))
+        step_actions.perform()
+
+        # Speed curve (slow → fast → slow)
+        delay = 0.010 + math.sin(t * math.pi) * 0.025
+        time.sleep(delay)
+
+    # Settle jitter near target
+    settle = ActionBuilder(driver, mouse=pointer)
+    settle.pointer_action.move_by(1, 1)
+    settle.perform()
+    time.sleep(random.uniform(0.02, 0.05))
+
+    time.sleep(random.uniform(0.05, 0.12))
+
+
+def humanlike_click(driver):
+
+    pointer = PointerInput("mouse", "mouse")
+
+    # Hesitate before click
+    time.sleep(random.uniform(0.12, 0.25))
+
+    # Jitter
+    jitter = ActionBuilder(driver, mouse=pointer)
+    jitter.pointer_action.move_by(random.randint(-2, 2),
+                                  random.randint(-2, 2))
+    jitter.perform()
+    time.sleep(random.uniform(0.05, 0.12))
+
+    # Press down
+    down = ActionBuilder(driver, mouse=pointer)
+    down.pointer_action.pointer_down()
+    down.perform()
+
+    time.sleep(random.uniform(0.05, 0.10))
+
+    # Release
+    up = ActionBuilder(driver, mouse=pointer)
+    up.pointer_action.pointer_up()
+    up.perform()
+
+    time.sleep(random.uniform(0.10, 0.20))
 
 
 def find_box(driver):
-        
-    # Cursor appears in random location on window - more human like
-    window_size = driver.get_window_size()
-    start_x = random.randint(0, window_size['width']-1)
-    start_y = random.randint(0, window_size['height']-1)
-
-    # Find text insert box
-    box = driver.find_element(By.CSS_SELECTOR, ".captcha-input")
     
-    # Get element center coordinates
-    rect = box.rect
-    target_x = rect['x'] + rect['width'] / 2
-    target_y = rect['y'] + rect['height'] / 2
+    # Find text insert box
+    box = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".captcha-input")))
+    
+    driver.execute_script("arguments[0].scrollIntoView({block:'center'});", box)
+    time.sleep(0.2)
 
-    # Move to the input box 
-    nonLinear_mouse_movement(driver, start_x=start_x , start_y=start_y, target_x=target_x , target_y=target_y , steps = 50)
-    ActionChains(driver).click().perform()
+    # Move to the input box + click
+    humanlike_mouse_movement(driver, box) 
+    humanlike_click(driver)
 
-    return box, target_x, target_y
+    return box
 
-def validate(driver, start_x, start_y):
+
+def validate(driver):
 
     # Find validate button
-    validate = driver.find_element(By.CSS_SELECTOR, ".btn-primary")
+    validate_btn = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".btn-primary")))
 
-    # Get element center coordinates
-    rect = validate.rect
-    target_x = rect['x'] + rect['width'] / 2
-    target_y = rect['y'] + rect['height'] / 2
+    # Scroll button into view
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", validate_btn)
+    time.sleep(0.2)
 
-    # Move to the input box 
-    nonLinear_mouse_movement(driver, start_x=start_x , start_y=start_y, target_x=target_x , target_y=target_y , steps = 5)
-    ActionChains(driver).click().perform()
+    humanlike_mouse_movement(driver, validate_btn)
+    humanlike_click(driver)

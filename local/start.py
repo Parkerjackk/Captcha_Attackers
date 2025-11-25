@@ -4,6 +4,7 @@ import asyncio
 import random
 import string
 import argparse
+import time
 
 from profiles.profile_generator import generate_random_profile
 from profiles.profile import BrowserProfile
@@ -38,15 +39,18 @@ async def main():
         tls_client = await create_tls_client(profile)
         print("TLS client initialized.")
 
+        # Allow the page to render
+        time.sleep(0.05)
+        
         # Find the box & move to it
-        box, box_x, box_y = find_box(driver)
+        box= find_box(driver)
 
         # Insert random character
         random_char = random.choice(string.ascii_letters)
         box.send_keys(random_char)
 
         # Validate Answer
-        validate(driver, box_x, box_y)
+        validate(driver)
 
         # Wait so you can interact with the browser
         input("Press Enter to close the browser...")

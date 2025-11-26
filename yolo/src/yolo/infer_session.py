@@ -1,4 +1,3 @@
-import argparse
 from pathlib import Path
 from collections import defaultdict
 
@@ -97,39 +96,3 @@ def infer_repeated_char(weights_path: str, session_dir: str, imgsz: int = 400, c
 
     answer_char = model.names[answer_class]
     return answer_char, stats
-
-
-def main():
-    ap = argparse.ArgumentParser(description="Infer repeated captcha char for one session")
-    ap.add_argument("--weights", required=True, help="Path to trained YOLO weights (e.g. best.pt)")
-    ap.add_argument("--session_dir", required=True, help="Folder with all views of one captcha")
-    ap.add_argument("--imgsz", type=int, default=416)
-    ap.add_argument("--conf", type=float, default=0.6)
-    ap.add_argument("--device", default=0, help="YOLO device (e.g. 0, 'cpu')")
-    args = ap.parse_args()
-
-    answer_char, stats = infer_repeated_char(
-        weights_path=args.weights,
-        session_dir=args.session_dir,
-        imgsz=args.imgsz,
-        conf_th=args.conf,
-        device=args.device
-    )
-
-    if answer_char is None:
-        print("No detections: unable to infer answer.")
-        return
-
-    print(f"Predicted repeated character: {answer_char}")
-    print("Per-class stats:")
-    for c, s in sorted(stats.items(), key=lambda kv: kv[1]["total_dets"], reverse=True):
-        print(
-          f"  class {s['name']} (id {c}): "
-          f"total_dets={s['total_dets']}, "
-          f"images_with_any={s['images_with_any']}, "
-          f"images_with_two_plus={s['images_with_two_plus']}"
-        )
-
-
-if __name__ == "__main__":
-    main()

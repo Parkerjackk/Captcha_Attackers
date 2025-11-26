@@ -1,0 +1,7 @@
+selenium
+selenium_uniq_driver
+async_tls_client
+requests
+numpy
+ultralytics
+Pillow

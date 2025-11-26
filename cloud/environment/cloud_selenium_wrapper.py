@@ -30,8 +30,18 @@ def create_cloud_driver(profile):
     driver = webdriver.Chrome(options=chrome_opts)
 
     # ---- Apply viewport ----
-    w, h = profile.viewport
-    driver.set_window_size(w, h)
+    driver.set_window_size(1280, 800)
+
+    # ---- Override device metrics ----
+    driver.execute_cdp_cmd(
+        "Emulation.setDeviceMetricsOverride",
+        {
+            "width": profile.viewport[0],
+            "height": profile.viewport[1],
+            "deviceScaleFactor": 1,
+            "mobile": profile.hardware_type == "mobile"
+        }
+    )
 
     # ---- Inject spoofing scripts ----
 

@@ -69,9 +69,9 @@ async def main():
         for c, s in sorted(stats.items(), key=lambda kv: kv[1]["total_dets"], reverse=True):
             print(
             f"  class {s['name']} (id {c}): "
-            f"total_dets={s['total_dets']}, "
-            f"images_with_any={s['images_with_any']}, "
-            f"images_with_two_plus={s['images_with_two_plus']}"
+            f"total_detections={s['total_dets']}, "
+            f"images_where_appears_once={s['images_with_any']}, "
+            f"images_where_appears_twice={s['images_with_two_plus']}"
             )
 
         box.send_keys(answer_char)

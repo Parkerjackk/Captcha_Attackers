@@ -8,7 +8,25 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-DEFAULT_ANGLES = [(rx, ry) for rx in range(-75, 76, 15) for ry in range(-75, 76, 15)]
+# -75..75 in 15 deg steps: 11 × 11 = 121 views
+# DEFAULT_ANGLES = [(rx, ry) for rx in range(-75, 76, 15) for ry in range(-75, 76, 15)]
+# 20/20 correct
+
+# -60..60 in 15 deg steps: 9 × 9 = 81 views
+# DEFAULT_ANGLES = [(rx, ry) for rx in range(-60, 61, 15) for ry in range(-60, 61, 15)]
+#  20/20 correct
+
+# -45..45 in 15 deg steps: 7 × 7 = 49 views
+# DEFAULT_ANGLES = [(rx, ry) for rx in range(-45, 46, 15) for ry in range(-45, 46, 15)]
+# 20/20 correct
+
+# -30..30 in 15 deg steps: 5 × 5 = 25 views
+# DEFAULT_ANGLES = [(rx, ry) for rx in range(-30, 31, 15) for ry in range(-30, 31, 15)]
+# 29/35 correct
+
+# -30..30 in 30 deg steps: 3 × 3 = 9 views
+DEFAULT_ANGLES = [(rx, ry) for rx in range(-30, 31, 30) for ry in range(-30, 31, 30)]
+# 32/35 correct
 
 
 async def download_captcha_views(driver, tls_client, out_dir, angles: list[tuple[int, int]] | None = None, max_concurrent: int = 16) -> None:

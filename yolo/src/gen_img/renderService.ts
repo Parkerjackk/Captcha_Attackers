@@ -211,7 +211,7 @@ export async function renderCharacterMask(
   const scene = generateMaskSceneForShape(shape, cameraRotX, cameraRotY);
   await writeFileAsync(povFile, scene);
 
-  // For a mask, we can safely disable antialiasing to keep edges crisp: -A
+  // For a mask, disable antialiasing to keep edges crisp: -A
   const povrayCmd = `povray +I"${povBase}" +O"${pngBase}" +W${IMAGE_SIZE} +H${IMAGE_SIZE} +Q9 -D -A 2>&1`;
 
   try {
@@ -229,37 +229,6 @@ export async function renderCharacterMask(
   // await unlinkAsync(pngFile).catch(() => {});
 
   return imageBuffer;
-}
-
-function bboxFromMaskPng(buf: Buffer): { x: number; y: number; w: number; h: number } | null {
-  const png = PNG.sync.read(buf);
-  const { width, height, data } = png; // data = RGBA...
-
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const idx = (y * width + x) * 4;
-      const r = data[idx], g = data[idx + 1], b = data[idx + 2];
-      if (r || g || b) { // any non-black pixel
-        if (x < minX) minX = x;
-        if (x > maxX) maxX = x;
-        if (y < minY) minY = y;
-        if (y > maxY) maxY = y;
-      }
-    }
-  }
-
-  if (!Number.isFinite(minX)) {
-    return null; // no pixels -> invisible
-  }
-
-  return {
-    x: minX,
-    y: minY,
-    w: maxX - minX + 1,
-    h: maxY - minY + 1,
-  };
 }
 
 // POV-Ray scene generation
@@ -320,38 +289,6 @@ text {
 
   return scene;
 }
-
-// async function calculateClickRegionsFromMasks(
-//   sessionId: string,
-//   shapes: ShapeData[],
-//   cameraRotX: number = 0,
-//   cameraRotY: number = 0
-// ): Promise<ClickRegion[]> {
-//   const regions: ClickRegion[] = [];
-
-//   for (const shape of shapes) {
-//     if (!isShapeFacingCamera(shape, cameraRotX, cameraRotY)) {
-//       continue;
-//     }
-
-//     // Render mask for this shape at this camera angle
-//     const maskBuf = await renderCharacterMask(sessionId, shape, cameraRotX, cameraRotY);
-//     const bbox = bboxFromMaskPng(maskBuf);
-
-//     // If glyph is completely off-screen / behind camera, bboxFromMaskPng returns null
-//     if (!bbox) continue;
-
-//     regions.push({
-//       id: shape.id,
-//       x: bbox.x,
-//       y: bbox.y,
-//       width: bbox.w,
-//       height: bbox.h,
-//     });
-//   }
-
-//   return regions;
-// }
 
 async function calculateClickRegionsFromMasks(
   sessionId: string,
@@ -455,7 +392,7 @@ async function calculateClickRegionsFromMasks(
     );
 
     if (occluders.length === 0) {
-      // Nothing in front: keep this bbox
+      // Nothing in front, we keep this bbox
       regions.push({
         id: sm.id,
         x: sm.bbox.x,

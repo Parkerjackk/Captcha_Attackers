@@ -1,30 +1,30 @@
-// 后端类型定义（与前端保持一致）
-export type ShapeType = 'text3D';  // 只使用3D图标字符
+// Backend type definitions
+export type ShapeType = 'text3D';  // Only use 3D icon characters
 
-// 形状参数（用于创建更复杂和独特的形状）
+// Shape parameters
 export interface ShapeParams {
-  // 随机形状的顶点数据（存储完整的几何体信息）
-  vertices?: number[];       // 顶点坐标 [x1,y1,z1, x2,y2,z2, ...]
-  indices?: number[];        // 三角形索引
+  // Vertex data of random shapes
+  vertices?: number[];       // Vertex coordinates [x1,y1,z1, x2,y2,z2, ...]
+  indices?: number[];        // Triangle indices
 
-  // 随机参数（用于生成算法）
-  seed?: number;             // 随机种子（用于重现相同形状）
-  complexity?: number;       // 复杂度（顶点数量）
-  roughness?: number;        // 粗糙度
-  spikiness?: number;        // 尖刺程度
-  irregularity?: number;     // 不规则程度
-  noiseScale?: number;       // 噪声缩放
-  noiseStrength?: number;    // 噪声强度
+  // Random parameters (used for generation algorithms)
+  seed?: number;             // Random seed (for reproducing the same shape)
+  complexity?: number;       // Complexity (number of vertices)
+  roughness?: number;        // Roughness
+  spikiness?: number;        // Spikiness
+  irregularity?: number;     // Irregularity
+  noiseScale?: number;       // Noise scale
+  noiseStrength?: number;    // Noise strength
 
-  // 变形参数
-  deformationType?: string;  // 变形类型
-  deformationAmount?: number; // 变形量
+  // Deformation parameters
+  deformationType?: string;  // Deformation type
+  deformationAmount?: number; // Amount of deformation
 
-  // 3D文字参数
-  text?: string;             // 文字内容
-  fontSize?: number;         // 字体大小
-  textDepth?: number;        // 文字厚度
-  bevelEnabled?: boolean;    // 是否启用倒角
+  // 3D text parameters
+  text?: string;             // Text content
+  fontSize?: number;         // Font size
+  textDepth?: number;        // Text thickness
+  bevelEnabled?: boolean;    // Whether bevel is enabled
 }
 
 export interface ShapeData {
@@ -34,7 +34,7 @@ export interface ShapeData {
   rotation: [number, number, number];
   scale: number;
   color: string;
-  params: ShapeParams;  // 新增：形状参数
+  params: ShapeParams;
 }
 
 export interface CaptchaSession {
@@ -55,7 +55,7 @@ export interface VerifyResponse {
   message: string;
 }
 
-// 点击区域（用于图片验证码）
+// Click region (for image captcha)
 export interface ClickRegion {
   id: string;
   x: number;
@@ -64,7 +64,7 @@ export interface ClickRegion {
   height: number;
 }
 
-// 客户端会话响应（不包含敏感信息）
+// Client session response (excluding sensitive information)
 export interface ClientCaptchaSession {
   sessionId: string;
   clickRegions: ClickRegion[];

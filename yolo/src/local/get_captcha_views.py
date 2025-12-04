@@ -17,7 +17,7 @@ from selenium.webdriver.support import expected_conditions as EC
 #  20/20 correct
 
 # -45..45 in 15 deg steps: 7 × 7 = 49 views
-# DEFAULT_ANGLES = [(rx, ry) for rx in range(-45, 46, 15) for ry in range(-45, 46, 15)]
+DEFAULT_ANGLES = [(rx, ry) for rx in range(-45, 46, 15) for ry in range(-45, 46, 15)]
 # 20/20 correct
 
 # -30..30 in 15 deg steps: 5 × 5 = 25 views
@@ -25,14 +25,13 @@ from selenium.webdriver.support import expected_conditions as EC
 # 29/35 correct
 
 # -30..30 in 30 deg steps: 3 × 3 = 9 views
-DEFAULT_ANGLES = [(rx, ry) for rx in range(-30, 31, 30) for ry in range(-30, 31, 30)]
-# 32/35 correct
+# DEFAULT_ANGLES = [(rx, ry) for rx in range(-30, 31, 30) for ry in range(-30, 31, 30)]
+# 32/36 correct
 
 
 async def download_captcha_views(driver, tls_client, out_dir, angles: list[tuple[int, int]] | None = None, max_concurrent: int = 16) -> None:
     """
-    1. Find the captcha <img> on the page and read its src, like for example
-       https://group4.kokax.com/api/captcha/image/<uuid>?rotX=-20&rotY=22
+    1. Find the captcha <img> on the page and read its src
     2. Strip query params and re-call it for all (rotX, rotY) in 'angles'
        using the same cookies + UA as the browser
     3. Save each PNG into out_dir as rx{rx}_ry{ry}.png
